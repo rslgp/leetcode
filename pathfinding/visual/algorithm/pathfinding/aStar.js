@@ -1,4 +1,4 @@
-import MinHeap from "../../data_structure/priority_queue/min_heap.js"
+import MinHeap from "../../data_structure/priority_queue/min_heap_withArray.js"
 
 // Node class
 class Node {
@@ -30,26 +30,32 @@ class Node {
 class ClosedList {
     constructor(grid) {
         this.width = grid[0].length;
-        this.instance = new Array(grid.length * this.width).fill(false);
+        //this.instance = new Array(grid.length * this.width).fill(false); // better performance
+        this.instance = new Set(); // better memory efficiency
     }
 
     visit(node) {
-        this.instance[node.x * this.width + node.y] = true;
+        let uniqueIndex = node.x * this.width + node.y;
+        // this.instance[uniqueIndex] = true;
+        this.instance.add(uniqueIndex);
     }
 
     isVisited(node) {
-        return this.instance[node.x * this.width + node.y] === true;
+        let uniqueIndex = node.x * this.width + node.y;
+        // return this.instance[uniqueIndex] === true;
+        return this.instance.has(uniqueIndex);
     }
 }
 
 function aStar(start, goal, grid) {
-    const openList = new MinHeap(); // Use a min-heap for the open list
+    const openList = new MinHeap(grid); // Use a min-heap for the open list
     const closedList = new ClosedList(grid); //set for memory of formula (index = x * width + y) vs 1D array for performance new Array(grid.length * width).fill(false);
 
     const explored = [];
 
 
     let neighbors = [];
+    let newX, newY;
     const directions = [
         { x: 1, y: 0 },
         { x: -1, y: 0 },
@@ -83,44 +89,50 @@ function aStar(start, goal, grid) {
                 temp = temp.parent;
             }
             path.reverse();
-            console.log(path);
             return { path, explored };
         }
 
         // Explore neighbors
         neighbors = [];
         for (const dir of directions) {
-            const newX = current.x + dir.x;
-            const newY = current.y + dir.y;
+            newX = current.x + dir.x;
+            newY = current.y + dir.y;
 
             if (
                 //bondaries
                 newX < LIMIT_COMPRIMENTO &&
                 newY < LIMIT_LARGURA &&
                 newX >= 0 &&
-                newY >= 0 &&
+                newY >= 0
+
                 //end-bondaries
-                grid[newX][newY] === 0
+                && grid[newX][newY] === 0 // free path
             ) {
                 neighbors.push(new Node(newX, newY));
             }
         }
 
+        let g, h, f, existingNode;
         for (const neighbor of neighbors) {
             if (closedList.isVisited(neighbor)) continue;
 
-            const g = current.g + 1;
-            const h = neighbor.calculateHeuristic(goal);
-            const f = g + h;
+            g = current.g + 1;
+            h = neighbor.calculateHeuristic(goal);
+            f = g + h;
 
             // Check if this neighbor is already in the openList with a better g cost
-            let existingNode = null;
+            // old minHeap
+            /*existingNode = null;
+            //openList.print()
             for (const node of openList.heap) {
                 if (node.equals(neighbor)) {
                     existingNode = node;
                     break;
                 }
             }
+            //*/
+            //minHeapWithMap
+            existingNode = openList.get(neighbor)
             if (existingNode && existingNode.g < g) continue;
 
             neighbor.g = g;

@@ -81,4 +81,36 @@ export default class MinHeap {
     isEmpty() {
         return this.heap.length === 0;
     }
+
+    // Print the heap in a readable format
+    print() {
+        if (this.heap.length === 0) {
+            console.log("Heap is empty.");
+            return;
+        }
+
+        // Helper function to print a node and its children
+        const printNode = (index, level) => {
+            const node = this.heap[index];
+            const indent = "  ".repeat(level);
+            console.log(`${indent}Node: (x=${node.x}, y=${node.y}), f=${node.f}`);
+
+            const leftChildIdx = this.leftChildIndex(index);
+            const rightChildIdx = this.rightChildIndex(index);
+
+            if (leftChildIdx < this.heap.length) {
+                console.log(`${indent}  Left Child:`);
+                printNode(leftChildIdx, level + 1);
+            }
+            if (rightChildIdx < this.heap.length) {
+                console.log(`${indent}  Right Child:`);
+                printNode(rightChildIdx, level + 1);
+            }
+        };
+
+        console.log("MinHeap:");
+        printNode(0, 0); // Start printing from the root (index 0)
+
+        console.log("------\n\n");
+    }
 }
