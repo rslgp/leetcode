@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A* Visualization</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        table {
+            border-collapse: collapse;
+        }
+
+        td {
+            width: 30px;
+            height: 30px;
+            border: 1px solid #ccc;
+            text-align: center;
+        }
+
+        .start {
+            background-color: green;
+        }
+
+        .goal {
+            background-color: red;
+        }
+
+        .blocked {
+            background-color: black;
+        }
+
+        .path {
+            background-color: blue;
+        }
+
+        .explored {
+            background-color: lightblue;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>A* Pathfinding Visualization</h1>
+    <table id="grid"></table>
+    <button id="startButton">Start A*</button>
+    <script type="module" src="visu_aStar.js"></script>
+</body>
+
+</html>
