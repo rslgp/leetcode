@@ -52,7 +52,7 @@ class ClosedList {
     }
 }
 
-function aStar(start, goal, grid, MaxWallIgnore = 1) {
+function aStar(start, goal, grid, MaxWallIgnore = 1, WALL_PENALITY = .01) {
     const openList = new MinHeap(grid); // Use a min-heap for the open list
     const closedList = new ClosedList(grid); // Use a closed list to track visited nodes
 
@@ -67,7 +67,6 @@ function aStar(start, goal, grid, MaxWallIgnore = 1) {
     ];
     const LIMIT_COMPRIMENTO = grid.length;
     const LIMIT_LARGURA = grid[0].length;
-    const WALL_PENALITY = .01; // Penalty for bypassing walls
 
     // Initialize the start node
     start.h = start.calculateHeuristic(goal);
