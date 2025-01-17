@@ -58,7 +58,6 @@ function aStar(start, goal, grid, MaxWallIgnore = 1) {
 
     const explored = [];
 
-    let neighbors = [];
     let newX, newY;
     const directions = [
         { x: 1, y: 0 },
@@ -96,7 +95,7 @@ function aStar(start, goal, grid, MaxWallIgnore = 1) {
                 temp = temp.parent;
             }
             path.reverse();
-            return { path, explored: [] };
+            return { path, explored };
         }
 
         // Explore neighbors
@@ -139,7 +138,7 @@ function aStar(start, goal, grid, MaxWallIgnore = 1) {
             }
         }
     }
-    return { path: [], explored: [] }; // No path found
+    return { path: [], explored }; // No path found
 }
 
 export { Node, aStar };
