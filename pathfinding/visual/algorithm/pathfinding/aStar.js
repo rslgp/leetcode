@@ -108,6 +108,7 @@ function aStar(start, goal, grid) {
                 //end-bondaries
                 && grid[newX][newY] === 0 // free path
             ) {
+                // that can be improved (see aStar_igWall) to only add add neighbors that are not visited and with smaller g cost
                 neighbors.push(new Node(newX, newY));
             }
         }
@@ -121,17 +122,6 @@ function aStar(start, goal, grid) {
             f = g + h;
 
             // Check if this neighbor is already in the openList with a better g cost
-            // old minHeap
-            /*existingNode = null;
-            //openList.print()
-            for (const node of openList.heap) {
-                if (node.equals(neighbor)) {
-                    existingNode = node;
-                    break;
-                }
-            }
-            //*/
-            //minHeapWithMap
             existingNode = openList.get(neighbor)
             if (existingNode && existingNode.g < g) continue;
 

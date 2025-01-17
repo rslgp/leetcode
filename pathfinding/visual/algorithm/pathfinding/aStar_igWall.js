@@ -47,6 +47,13 @@ class ClosedList {
         // return this.instance[uniqueIndex] === true;
         return this.instance.has(uniqueIndex);
     }
+
+    isVisited(x, y) {
+        let uniqueIndex = x * this.width + y;
+        // return this.instance[uniqueIndex] === true;
+        return this.instance.has(uniqueIndex);
+    }
+
 }
 
 function aStar(start, goal, grid, MaxWallIgnore = 1) {
@@ -96,6 +103,8 @@ function aStar(start, goal, grid, MaxWallIgnore = 1) {
 
         // Explore neighbors
         neighbors.length = 0;
+
+        let existingNode;
         for (const dir of directions) {
             newX = current.x + dir.x;
             newY = current.y + dir.y;
@@ -115,30 +124,25 @@ function aStar(start, goal, grid, MaxWallIgnore = 1) {
 
                 if (wall > MaxWallIgnore) continue;
 
-                neighbors.push(new Node(newX, newY, wall));
+                if (closedList.isVisited(newX, newY)) continue;
+
+                let g = current.g + 1
+                let n = new Node(newX, newY, wall, g)
+                // Check if this neighbor is already in the openList with a better g cost
+                existingNode = openList.get(n)
+                if (existingNode && existingNode.g < g) continue;
+
+                // only add neighbors that are not visited and with smaller g cost
+                neighbors.push(n);
             }
         }
 
-        let g, h, f, existingNode;
         for (const neighbor of neighbors) {
-            if (closedList.isVisited(neighbor)) continue;
-
-            g = current.g + 1;
-            h = neighbor.calculateHeuristic(goal);
-            f = g + h;
-
-            // Check if this neighbor is already in the openList with a better g cost
-            existingNode = openList.get(neighbor)
-            if (existingNode && existingNode.g < g) continue;
-
-            neighbor.g = g;
-            neighbor.h = h;
-            neighbor.f = f;
+            neighbor.h = neighbor.calculateHeuristic(goal);
+            neighbor.f = neighbor.g + neighbor.h;
             neighbor.parent = current;
 
-            if (!existingNode) {
-                openList.insert(neighbor);
-            }
+            openList.insert(neighbor);
         }
     }
     return { path: [], explored }; // No path found
