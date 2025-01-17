@@ -1,4 +1,4 @@
-import MinHeap from "../../data_structure/priority_queue/min_heap_withArray.js"
+import MinHeap from "../../data_structure/priority_queue/min_heap_array.js"
 
 // Node class
 class Node {
