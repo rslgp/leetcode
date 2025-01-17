@@ -1,4 +1,5 @@
-import MinHeap from "../../data_structure/priority_queue/min_heap_array.js"
+//HIGHLY OPTIMIZED
+import MinHeap from "../../data_structure/priority_queue/min_heap_array.js";
 
 // Node class
 class Node {
@@ -9,8 +10,7 @@ class Node {
         this.h = h; // Heuristic cost to goal
         this.f = f; // Total cost (g + h)
         this.parent = parent; // To track the path
-
-        this.wallIgnored = wall;
+        this.wallIgnored = wall; // Number of walls ignored to reach this node
     }
 
     // Helper method to calculate the heuristic (Manhattan distance)
@@ -32,19 +32,16 @@ class Node {
 class ClosedList {
     constructor(grid) {
         this.width = grid[0].length;
-        //this.instance = new Array(grid.length * this.width).fill(false); // better performance
-        this.instance = new Set(); // better memory efficiency
+        this.instance = new Set(); // Use a Set for memory efficiency
     }
 
     visit(node) {
         let uniqueIndex = node.x * this.width + node.y;
-        // this.instance[uniqueIndex] = true;
         this.instance.add(uniqueIndex);
     }
 
     isVisited(node) {
         let uniqueIndex = node.x * this.width + node.y;
-        // return this.instance[uniqueIndex] === true;
         return this.instance.has(uniqueIndex);
     }
 
@@ -53,15 +50,13 @@ class ClosedList {
         // return this.instance[uniqueIndex] === true;
         return this.instance.has(uniqueIndex);
     }
-
 }
 
 function aStar(start, goal, grid, MaxWallIgnore = 1) {
     const openList = new MinHeap(grid); // Use a min-heap for the open list
-    const closedList = new ClosedList(grid); //set for memory of formula (index = x * width + y) vs 1D array for performance new Array(grid.length * width).fill(false);
+    const closedList = new ClosedList(grid); // Use a closed list to track visited nodes
 
     const explored = [];
-
 
     let neighbors = [];
     let newX, newY;
@@ -73,6 +68,7 @@ function aStar(start, goal, grid, MaxWallIgnore = 1) {
     ];
     const LIMIT_COMPRIMENTO = grid.length;
     const LIMIT_LARGURA = grid[0].length;
+    const WALL_PENALITY = .01; // Penalty for bypassing walls
 
     // Initialize the start node
     start.h = start.calculateHeuristic(goal);
@@ -82,6 +78,8 @@ function aStar(start, goal, grid, MaxWallIgnore = 1) {
     while (!openList.isEmpty()) {
         // Extract the node with the lowest f cost
         const current = openList.extractMin();
+
+        // Mark the node as visited
         closedList.visit(current);
 
         // Highlight explored nodes
@@ -98,54 +96,50 @@ function aStar(start, goal, grid, MaxWallIgnore = 1) {
                 temp = temp.parent;
             }
             path.reverse();
-            return { path, explored };
+            return { path, explored: [] };
         }
 
         // Explore neighbors
-        neighbors.length = 0;
-
-        let existingNode;
         for (const dir of directions) {
             newX = current.x + dir.x;
             newY = current.y + dir.y;
 
+            // Check boundaries
             if (
-                //bondaries
                 newX < LIMIT_COMPRIMENTO &&
                 newY < LIMIT_LARGURA &&
                 newX >= 0 &&
                 newY >= 0
-
-                //end-bondaries
-                // && grid[newX][newY] === 0 // free path
             ) {
                 const isObs = grid[newX][newY] === 1;
-                const wall = current.wallIgnored + (isObs ? 1 : 0); // count obstacle ignored per node
+                const wall = current.wallIgnored + (isObs ? 1 : 0); // Count obstacles ignored per node
 
+                // Skip if the number of walls ignored exceeds the limit
                 if (wall > MaxWallIgnore) continue;
 
+                // Skip if the neighbor is already in the closed list
                 if (closedList.isVisited(newX, newY)) continue;
 
-                let g = current.g + 1
-                let n = new Node(newX, newY, wall, g)
-                // Check if this neighbor is already in the openList with a better g cost
-                existingNode = openList.get(n)
-                if (existingNode && existingNode.g < g) continue;
+                // Create a new neighbor node
+                const neighbor = new Node(newX, newY, wall, current.g + 1);
 
-                // only add neighbors that are not visited and with smaller g cost
-                neighbors.push(n);
+
+                // Calculate the heuristic and total cost
+                neighbor.h = neighbor.calculateHeuristic(goal);
+                const wallPenalty = neighbor.wallIgnored > 0 ? WALL_PENALITY : 0; // Large penalty for bypassing walls
+                neighbor.f = neighbor.g + neighbor.h + wallPenalty;
+                neighbor.parent = current;
+
+                // Check if this neighbor is already in the open list with a better or equal cost
+                const existingNode = openList.get(neighbor);
+                if (existingNode && existingNode.f <= neighbor.f) continue;
+
+                // Add the neighbor to the open list
+                openList.insert(neighbor);
             }
         }
-
-        for (const neighbor of neighbors) {
-            neighbor.h = neighbor.calculateHeuristic(goal);
-            neighbor.f = neighbor.g + neighbor.h;
-            neighbor.parent = current;
-
-            openList.insert(neighbor);
-        }
     }
-    return { path: [], explored }; // No path found
+    return { path: [], explored: [] }; // No path found
 }
 
-export { Node, aStar }
+export { Node, aStar };

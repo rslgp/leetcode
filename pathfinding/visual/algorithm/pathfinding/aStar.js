@@ -45,6 +45,13 @@ class ClosedList {
         // return this.instance[uniqueIndex] === true;
         return this.instance.has(uniqueIndex);
     }
+
+
+    isVisited(x, y) {
+        let uniqueIndex = x * this.width + y;
+        // return this.instance[uniqueIndex] === true;
+        return this.instance.has(uniqueIndex);
+    }
 }
 
 function aStar(start, goal, grid) {
@@ -108,6 +115,7 @@ function aStar(start, goal, grid) {
                 //end-bondaries
                 && grid[newX][newY] === 0 // free path
             ) {
+                if (closedList.isVisited(newX, newY)) continue;
                 // that can be improved (see aStar_igWall) to only add add neighbors that are not visited and with smaller g cost
                 neighbors.push(new Node(newX, newY));
             }
@@ -115,7 +123,7 @@ function aStar(start, goal, grid) {
 
         let g, h, f, existingNode;
         for (const neighbor of neighbors) {
-            if (closedList.isVisited(neighbor)) continue;
+            //if (closedList.isVisited(neighbor)) continue;
 
             g = current.g + 1;
             h = neighbor.calculateHeuristic(goal);
@@ -123,7 +131,7 @@ function aStar(start, goal, grid) {
 
             // Check if this neighbor is already in the openList with a better g cost
             existingNode = openList.get(neighbor)
-            if (existingNode && existingNode.g < g) continue;
+            if (existingNode && existingNode.f < f) continue;
 
             neighbor.g = g;
             neighbor.h = h;
