@@ -93,7 +93,7 @@ function aStar(start, goal, grid) {
         }
 
         // Explore neighbors
-        neighbors = [];
+        neighbors.length = 0;
         for (const dir of directions) {
             newX = current.x + dir.x;
             newY = current.y + dir.y;
